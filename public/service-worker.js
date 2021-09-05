@@ -11,6 +11,25 @@ const FILES_TO_CACHE = [
 const CACHE_NAME = 'static-cache-v1';
 const DATA_CACHE_NAME = 'data-cache-v1';
 
+var idbRequest = indexedDB.open('budgetdatabase', 1);
+var idbDatabase;
+
+idbRequest.onerror = function (error) {
+	console.error('Error:', error);
+};
+
+idbRequest.onsuccess = function () {
+	idbDatabase = this.result;
+};
+
+idbRequest.onupgradeneeded = function ({ target }) {
+	console.log('objectstore');
+	const db = target.result;
+	const objectStore = db.createObjectStore('transactions');
+
+	objectStore.createIndex('transactions', 'transaction');
+};
+
 self.addEventListener('install', function (e) {
 	e.waitUntil(
 		caches.open(DATA_CACHE_NAME).then((cache) => cache.add('/api/transaction'))
